@@ -18,12 +18,14 @@
     <script src="//cdn.datatables.net/2.3.1/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#tablaUsuariosTrash').DataTable({
-                language: {
-                    url: "https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json"
-                }
-                // No se necesitan botones de exportación en la papelera generalmente
-            });
+            @if($data->count() > 0)
+                $('#tablaUsuariosTrash').DataTable({
+                    language: {
+                        url: "https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json"
+                    }
+                    // No se necesitan botones de exportación en la papelera generalmente
+                });
+            @endif
         });
     </script>
 @endsection

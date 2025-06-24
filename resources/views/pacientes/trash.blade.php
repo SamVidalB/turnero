@@ -18,11 +18,13 @@
     <script src="//cdn.datatables.net/2.3.1/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#tablaPacientesTrash').DataTable({
-                language: {
-                    url: "https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json"
-                }
-            });
+            @if($data->count() > 0)
+                $('#tablaPacientesTrash').DataTable({
+                    language: {
+                        url: "https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json"
+                    }
+                });
+            @endif
         });
     </script>
 @endsection

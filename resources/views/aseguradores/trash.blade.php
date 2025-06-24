@@ -26,26 +26,37 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($data as $asegurador)
+                @if($data->count() > 0)
+                    @foreach($data as $asegurador)
+                        <tr>
+                            <!-- <td>{{ $asegurador->id }}</td> -->
+                            <td>{{ $asegurador->nit }}</td>
+                            <td>{{ $asegurador->nombre }}</td>
+                            <td>
+                                <form action="{{ url('aseguradores/' . $asegurador->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-icon btn-outline-primary" title="Recuperar" onclick="return confirm('¿Está seguro de que desea recuperar este asegurador?');">
+                                        <span class="icon-base bx bx-undo icon-md"></span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                @else
                     <tr>
-                        <!-- <td>{{ $asegurador->id }}</td> -->
-                        <td>{{ $asegurador->nit }}</td>
-                        <td>{{ $asegurador->nombre }}</td>
-                        <td>
-
-                            <form action="{{ url('aseguradores/' . $asegurador->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-icon btn-outline-primary" title="Recuperar" onclick="return confirm('¿Está seguro de que desea recuperar este asegurador?');">
-                                    <span class="icon-base bx bx-undo icon-md"></span>
-                                </button>
-                            </form>
-                        </td>
+                        <td colspan="3" class="text-center">No hay aseguradores en la papelera.</td>
                     </tr>
-                @endforeach
+                @endif
             </tbody>
         </table>
 
     </div> 
 
+@endsection
+
+@section('scripts')
+    {{-- DataTables no se incluye aquí si la tabla es estática o se maneja diferente sin datos --}}
+    {{-- Si se quisiera DataTables también para la tabla de papelera, se necesitaría la misma lógica condicional en scripts --}}
+    {{-- Por ahora, esta vista no parece estar usando DataTables en su script, así que el cambio principal es el colspan --}}
 @endsection
