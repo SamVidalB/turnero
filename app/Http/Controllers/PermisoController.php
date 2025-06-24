@@ -16,7 +16,7 @@ class PermisoController extends Controller
      */
     public function index()
     {
-        $users = User::orderBy('name')->get();
+        $users = User::orderBy('nombre')->get();
         $acciones = Accion::orderBy('nombre')->get();
         return view('permisos.index', compact('users', 'acciones'));
     }

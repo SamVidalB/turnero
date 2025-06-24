@@ -9,6 +9,8 @@ class Accion extends Model
 {
     use HasFactory;
 
+    protected $table = 'acciones';
+
     protected $fillable = ['nombre', 'ruta'];
 
     /**
