@@ -47,8 +47,11 @@ class User extends Authenticatable
         return $this->hasMany(Turno::class);
     }
 
-    public function permisos()
+    /**
+     * Las acciones a las que el usuario tiene permiso.
+     */
+    public function acciones()
     {
-        return $this->belongsToMany(Permiso::class);
+        return $this->belongsToMany(Accion::class, 'accion_user'); // Nombre de la tabla pivote
     }
 }

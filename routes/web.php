@@ -8,8 +8,6 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SedeController;
 use App\Http\Controllers\UserController; // Corregido de UsuarioController a UserController
 use App\Http\Controllers\PacienteController;
-use App\Http\Controllers\PermisoController; // Añadir PermisoController
-
 
 Route::get('/', function () {
     // Si el usuario está autenticado, redirigir a una página de dashboard, sino al login
@@ -21,7 +19,7 @@ Route::get('/', function () {
 
 Route::get('/login', function () {
     if (auth()->check()) {
-        return redirect('/aseguradores'); 
+        return redirect('/aseguradores');
     }
     return view('login');
 })->name('login');
@@ -59,18 +57,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Usuarios (recordar que el controlador se llama UserController)
     Route::get('usuarios/trash', [UserController::class, 'trash'])->name('usuarios.trash');
+    Route::post('usuarios/{user}/permissions', [UserController::class, 'updatePermissions'])->name('usuarios.updatePermissions'); // Ruta para actualizar permisos
     Route::resource('usuarios', UserController::class); // El recurso debe coincidir con el nombre base de las rutas
 
     // Pacientes
     Route::get('pacientes/trash', [PacienteController::class, 'trash'])->name('pacientes.trash');
     Route::resource('pacientes', PacienteController::class);
 
-    // Rutas para la administración de permisos
-    Route::get('permisos', [PermisoController::class, 'index'])->name('permisos.index');
-    Route::get('permisos/{user}/acciones', [PermisoController::class, 'getUserAcciones'])->name('permisos.user.acciones');
-    Route::post('permisos/{user}', [PermisoController::class, 'update'])->name('permisos.update');
-
-    
     Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 });

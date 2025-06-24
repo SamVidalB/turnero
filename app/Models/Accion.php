@@ -9,15 +9,17 @@ class Accion extends Model
 {
     use HasFactory;
 
-    protected $table = 'acciones';
-
-    protected $fillable = ['nombre', 'ruta'];
+    protected $fillable = [
+        'nombre',
+        'ruta',
+        'modulo' // Añadido para agrupación en la UI
+    ];
 
     /**
-     * The users that belong to the Accion.
+     * Los usuarios que tienen esta acción.
      */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'permisos', 'accion_id', 'usuario_id');
+        return $this->belongsToMany(User::class, 'accion_user'); // 'accion_user' será nuestra tabla pivote
     }
 }
