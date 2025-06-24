@@ -9,14 +9,15 @@ class Permiso extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'usuario_id',
-        'acciones',
-    ];
+    protected $table = 'permisos'; // Especificar el nombre de la tabla si no sigue la convención de Laravel
 
-    public function usuario()
+    protected $fillable = ['usuario_id', 'acciones'];
+
+    /**
+     * Get the user that owns the permission.
+     */
+    public function user()
     {
-        return $this->belongsToMany(Usuario::class);
+        return $this->belongsTo(User::class, 'usuario_id');
     }
-
 }

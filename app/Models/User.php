@@ -41,4 +41,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * The actions that the user has permission to.
+     */
+    public function acciones()
+    {
+        return $this->belongsToMany(Accion::class, 'permisos', 'usuario_id', 'accion_id');
+    }
+
+    /**
+     * Get the permissions for the user.
+     */
+    public function permisos()
+    {
+        return $this->hasOne(Permiso::class, 'usuario_id');
+    }
 }
