@@ -128,58 +128,58 @@
           <ul class="menu-inner py-1">
             
             
-            <li class="menu-item">
-              <a href="" class="menu-link">
+            <li class="menu-item {{ Request::is('dashboard') || Request::is('/') ? 'active' : '' }}">
+              <a href="{{ route('dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home"></i>
-                <div class="text-truncate" data-i18n="Email">Inicio</div>
+                <div class="text-truncate" data-i18n="Inicio">Inicio</div>
               </a>
             </li>
 
-            <li class="menu-item">
-              <a href="" class="menu-link">
+            <li class="menu-item {{ Request::is('turnos*') ? 'active' : '' }}">
+              <a href="{{ url('turnos') }}" class="menu-link"> {{-- Ajustar si la ruta de turnos es diferente --}}
                 <i class="menu-icon tf-icons bx bx-task"></i>
-                <div class="text-truncate" data-i18n="Email">Turnos</div>
+                <div class="text-truncate" data-i18n="Turnos">Turnos</div>
               </a>
             </li>
 
-            <li class="menu-item">
-              <a href="" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user"></i>
-                <div class="text-truncate" data-i18n="Email">Pacientes</div>
+            <li class="menu-item {{ Request::is('pacientes*') ? 'active' : '' }}">
+              <a href="{{ route('pacientes.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-user-plus"></i> {{-- Icono cambiado para pacientes --}}
+                <div class="text-truncate" data-i18n="Pacientes">Pacientes</div>
               </a>
             </li>
             
           
-            <!-- Dashboards -->
-            <li class="menu-item">
+            <!-- Configuración -->
+            <li class="menu-item {{ Request::is('aseguradores*') || Request::is('categorias*') || Request::is('sedes*') || Request::is('usuarios*') || Request::is('permisos*') ? 'open active' : '' }}">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-cog"></i>
-                <div class="text-truncate" data-i18n="Dashboards">Configuración</div>
+                <div class="text-truncate" data-i18n="Configuración">Configuración</div>
               </a>
               <ul class="menu-sub">
-                <li class="menu-item active">
-                  <a href="{{ url('aseguradores') }}" class="menu-link">
-                    <div class="text-truncate" data-i18n="CRM">Aseguradores</div>
+                <li class="menu-item {{ Request::is('aseguradores*') ? 'active' : '' }}">
+                  <a href="{{ route('aseguradores.index') }}" class="menu-link">
+                    <div class="text-truncate" data-i18n="Aseguradores">Aseguradores</div>
                   </a>
                 </li>
-                <li class="menu-item">
-                  <a href="" class="menu-link">
-                    <div class="text-truncate" data-i18n="eCommerce">Categorías</div>
+                <li class="menu-item {{ Request::is('categorias*') ? 'active' : '' }}">
+                  <a href="{{ route('categorias.index') }}" class="menu-link">
+                    <div class="text-truncate" data-i18n="Categorías">Categorías</div>
                   </a>
                 </li>
-                <li class="menu-item">
-                  <a href="" class="menu-link">
-                    <div class="text-truncate" data-i18n="Logistics">Sedes</div>
+                <li class="menu-item {{ Request::is('sedes*') ? 'active' : '' }}">
+                  <a href="{{ route('sedes.index') }}" class="menu-link">
+                    <div class="text-truncate" data-i18n="Sedes">Sedes</div>
                   </a>
                 </li>
-                <li class="menu-item">
-                  <a href="" class="menu-link">
-                    <div class="text-truncate" data-i18n="Academy">Usuarios</div>
+                <li class="menu-item {{ Request::is('usuarios*') ? 'active' : '' }}">
+                  <a href="{{ route('usuarios.index') }}" class="menu-link">
+                    <div class="text-truncate" data-i18n="Usuarios">Usuarios</div>
                   </a>
                 </li>
-                <li class="menu-item">
-                  <a href="" class="menu-link">
-                    <div class="text-truncate" data-i18n="Academy">Permisos</div>
+                <li class="menu-item {{ Request::is('permisos*') ? 'active' : '' }}">
+                  <a href="" class="menu-link"> {{-- Ajustar si la ruta de permisos es diferente --}}
+                    <div class="text-truncate" data-i18n="Permisos">Permisos</div>
                   </a>
                 </li>
               </ul>
