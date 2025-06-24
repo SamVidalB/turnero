@@ -56,6 +56,46 @@
 
             <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
         </form>
+
+        <hr class="my-4">
+
+        {{-- Sección de Permisos --}}
+        <div class="card mt-4">
+            <h5 class="card-header">Gestionar Permisos</h5>
+            <div class="card-body">
+                <form action="{{ route('usuarios.updatePermissions', $usuario->id) }}" method="POST">
+                    @csrf
+                    {{-- Aunque la ruta es POST, algunos prefieren especificar @method('POST') explícitamente --}}
+
+                    @if(isset($accionesDisponibles) && $accionesDisponibles->count() > 0)
+                        @php $currentModulo = ''; @endphp
+                        @foreach($accionesDisponibles as $accion)
+                            @if($accion->modulo !== $currentModulo)
+                                @if($currentModulo !== '')
+                                    </div> {{-- Cierra el div del grupo anterior de checkboxes --}}
+                                @endif
+                                <h6 class="mt-3">{{ $accion->modulo ?: 'General' }}</h6>
+                                <div class="list-group list-group-flush"> {{-- Abre un div para el nuevo grupo de checkboxes --}}
+                                @php $currentModulo = $accion->modulo; @endphp
+                            @endif
+                            <label class="list-group-item">
+                                <input class="form-check-input me-1" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_{{ $accion->id }}"
+                                       {{ (isset($accionesAsignadasIds) && in_array($accion->id, $accionesAsignadasIds)) ? 'checked' : '' }}>
+                                {{ $accion->nombre }}
+                                <small class="text-muted">({{ $accion->ruta }})</small>
+                            </label>
+                            @if($loop->last && $currentModulo !== '')
+                                </div> {{-- Cierra el último div del grupo de checkboxes --}}
+                            @endif
+                        @endforeach
+                    @else
+                        <p>No hay acciones disponibles para asignar.</p>
+                    @endif
+
+                    <button type="submit" class="btn btn-primary mt-3">Guardar Permisos</button>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection
 

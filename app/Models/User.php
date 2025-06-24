@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,15 +11,15 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    protected $table = 'usuarios'; // Especificar el nombre de la tabla si es diferente de 'users'
+
     protected $fillable = [
-        'name',
+        'nombre',
+        'documento',
         'email',
         'password',
+        'rol',
+        'estado'
     ];
 
     /**
@@ -40,21 +39,19 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed', // Asegurar que la contraseña se hashea automáticamente
     ];
 
-    /**
-     * The actions that the user has permission to.
-     */
-    public function acciones()
+    public function turnos()
     {
-        return $this->belongsToMany(Accion::class, 'permisos', 'usuario_id', 'accion_id');
+        return $this->hasMany(Turno::class);
     }
 
     /**
-     * Get the permissions for the user.
+     * Las acciones a las que el usuario tiene permiso.
      */
-    public function permisos()
+    public function acciones()
     {
-        return $this->hasOne(Permiso::class, 'usuario_id');
+        return $this->belongsToMany(Accion::class, 'accion_user'); // Nombre de la tabla pivote
     }
 }

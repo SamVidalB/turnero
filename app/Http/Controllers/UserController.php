@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User; // Cambiado de Usuario a User
+use App\Models\User;
+use App\Models\Accion; // Importar el modelo Accion
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; // Importar Hash para contraseñas
-use Illuminate\Support\Facades\Validator; // Importar Validator
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule; // Importar Rule para validaciones avanzadas
 
-class UserController extends Controller // Cambiado de UsuarioController a UserController
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -74,11 +76,11 @@ class UserController extends Controller // Cambiado de UsuarioController a UserC
      */
     public function edit(string $id)
     {
-        $usuario = User::find($id);
-        if (!$usuario) {
-            return redirect('usuarios')->with('error', 'Usuario no encontrado.');
-        }
-        return view('usuarios.edit', compact('usuario'));
+        $usuario = User::findOrFail($id); // Usar findOrFail para error 404 si no se encuentra
+        $accionesDisponibles = Accion::orderBy('modulo')->orderBy('nombre')->get();
+        $accionesAsignadasIds = $usuario->acciones->pluck('id')->toArray();
+
+        return view('usuarios.edit', compact('usuario', 'accionesDisponibles', 'accionesAsignadasIds'));
     }
 
     /**
@@ -137,5 +139,25 @@ class UserController extends Controller // Cambiado de UsuarioController a UserC
         } else {
             return back()->with('message', 'Usuario eliminado correctamente.')->with('type', 'danger');
         }
+    }
+
+    /**
+     * Update the user's permissions.
+     */
+    public function updatePermissions(Request $request, User $user) // Inyección de modelo User
+    {
+        $request->validate([
+            'acciones_ids'   => 'nullable|array',
+            'acciones_ids.*' => [ // Validar cada elemento del array
+                'integer',
+                Rule::exists('acciones', 'id'), // Asegurar que cada ID exista en la tabla acciones
+            ],
+        ]);
+
+        $user->acciones()->sync($request->input('acciones_ids', []));
+
+        return redirect()->route('usuarios.edit', $user->id)
+                         ->with('message', 'Permisos actualizados correctamente.')
+                         ->with('type', 'success');
     }
 }
