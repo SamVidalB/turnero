@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accion_user', function (Blueprint $table) {
+        Schema::create('permisos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('usuarios')->onDelete('cascade');
-            $table->foreignId('accion_id')->constrained('acciones')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('usuarios')->onDelete('cascade')->unique(); // Asegura un registro de permiso por usuario
+            $table->json('acciones')->nullable(); // Almacena un array de IDs de acciones. Usar json() es preferible.
             $table->timestamps();
-
-            // Opcional: Clave única para evitar duplicados
-            // $table->unique(['user_id', 'accion_id']);
         });
     }
 
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accion_user');
+        Schema::dropIfExists('permisos');
     }
 };

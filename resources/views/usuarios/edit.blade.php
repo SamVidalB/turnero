@@ -54,19 +54,11 @@
             </div>
             <p class="text-muted">Deje los campos de contraseña en blanco si no desea cambiarla.</p>
 
-            <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
-        </form>
-
-        <hr class="my-4">
-
-        {{-- Sección de Permisos --}}
-        <div class="card mt-4">
-            <h5 class="card-header">Gestionar Permisos</h5>
-            <div class="card-body">
-                <form action="{{ route('usuarios.updatePermissions', $usuario->id) }}" method="POST">
-                    @csrf
-                    {{-- Aunque la ruta es POST, algunos prefieren especificar @method('POST') explícitamente --}}
-
+            {{-- La sección de permisos ahora es parte del formulario principal --}}
+            <hr class="my-4">
+            <div class="card mt-4 mb-4">
+                <h5 class="card-header">Gestionar Permisos</h5>
+                <div class="card-body">
                     @if(isset($accionesDisponibles) && $accionesDisponibles->count() > 0)
                         @php $currentModulo = ''; @endphp
                         @foreach($accionesDisponibles as $accion)
@@ -79,8 +71,9 @@
                                 @php $currentModulo = $accion->modulo; @endphp
                             @endif
                             <label class="list-group-item">
-                                <input class="form-check-input me-1" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_{{ $accion->id }}"
-                                       {{ (isset($accionesAsignadasIds) && in_array($accion->id, $accionesAsignadasIds)) ? 'checked' : '' }}>
+                                {{-- Se usa old() para mantener el estado en caso de error de validación del formulario principal --}}
+                                <input class="form-check-input me-1" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_edit_{{ $accion->id }}"
+                                       {{ (is_array(old('acciones_ids', $accionesAsignadasIds ?? [])) && in_array($accion->id, old('acciones_ids', $accionesAsignadasIds ?? []))) ? 'checked' : '' }}>
                                 {{ $accion->nombre }}
                                 <small class="text-muted">({{ $accion->ruta }})</small>
                             </label>
@@ -88,14 +81,15 @@
                                 </div> {{-- Cierra el último div del grupo de checkboxes --}}
                             @endif
                         @endforeach
+                        @error('acciones_ids.*') <div class="error text-danger mt-2">{{ $message }}</div> @enderror
                     @else
                         <p>No hay acciones disponibles para asignar.</p>
                     @endif
-
-                    <button type="submit" class="btn btn-primary mt-3">Guardar Permisos</button>
-                </form>
+                </div>
             </div>
-        </div>
+             {{-- El botón de submit del formulario principal ya cubre esto --}}
+            <button type="submit" class="btn btn-primary">Actualizar Usuario y Permisos</button>
+        </form>
     </div>
 @endsection
 

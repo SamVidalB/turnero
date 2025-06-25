@@ -48,10 +48,40 @@ class User extends Authenticatable
     }
 
     /**
-     * Las acciones a las que el usuario tiene permiso.
+     * El registro de permisos asociado al usuario.
      */
-    public function acciones()
+    public function permiso()
     {
-        return $this->belongsToMany(Accion::class, 'accion_user'); // Nombre de la tabla pivote
+        return $this->hasOne(Permiso::class, 'user_id');
+    }
+
+    /**
+     * Obtiene los IDs de las acciones permitidas para el usuario.
+     * Retorna un array vacío si no tiene permisos asignados.
+     */
+    public function getAccionesPermitidasIdsAttribute(): array
+    {
+        return $this->permiso ? ($this->permiso->acciones ?? []) : [];
+    }
+
+    /**
+     * Verifica si el usuario tiene una acción específica por su ID.
+     */
+    public function hasAccionId(int $accionId): bool
+    {
+        return in_array($accionId, $this->getAccionesPermitidasIdsAttribute());
+    }
+
+    /**
+     * Verifica si el usuario tiene una acción específica por su nombre de ruta.
+     * Esto requiere cargar la acción desde la BD.
+     */
+    public function hasAccionRuta(string $rutaNombre): bool
+    {
+        $accion = Accion::where('ruta', $rutaNombre)->first();
+        if (!$accion) {
+            return false;
+        }
+        return $this->hasAccionId($accion->id);
     }
 }
