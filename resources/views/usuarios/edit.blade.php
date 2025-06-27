@@ -60,26 +60,22 @@
                 <h5 class="card-header">Gestionar Permisos</h5>
                 <div class="card-body">
                     @if(isset($accionesDisponibles) && $accionesDisponibles->count() > 0)
-                        @php $currentModulo = ''; @endphp
-                        @foreach($accionesDisponibles as $accion)
-                            @if($accion->modulo !== $currentModulo)
-                                @if($currentModulo !== '')
-                                    </div> {{-- Cierra el div del grupo anterior de checkboxes --}}
-                                @endif
-                                <h6 class="mt-3">{{ $accion->modulo ?: 'General' }}</h6>
-                                <div class="list-group list-group-flush"> {{-- Abre un div para el nuevo grupo de checkboxes --}}
-                                @php $currentModulo = $accion->modulo; @endphp
-                            @endif
-                            <label class="list-group-item">
-                                {{-- Se usa old() para mantener el estado en caso de error de validación del formulario principal --}}
-                                <input class="form-check-input me-1" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_edit_{{ $accion->id }}"
-                                       {{ (is_array(old('acciones_ids', $accionesAsignadasIds ?? [])) && in_array($accion->id, old('acciones_ids', $accionesAsignadasIds ?? []))) ? 'checked' : '' }}>
-                                {{ $accion->nombre }}
-                                <small class="text-muted">({{ $accion->ruta }})</small>
-                            </label>
-                            @if($loop->last && $currentModulo !== '')
-                                </div> {{-- Cierra el último div del grupo de checkboxes --}}
-                            @endif
+                        @foreach($accionesDisponibles->groupBy('modulo') as $modulo => $accionesDelModulo)
+                            <h6 class="mt-3">{{ $modulo ?: 'General' }}</h6>
+                            <div class="row"> {{-- Contenedor de fila para las columnas de acciones --}}
+                                @foreach($accionesDelModulo as $accion)
+                                    <div class="col-md-4 mb-2"> {{-- 3 columnas en desktop, 1 en móvil --}}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_edit_{{ $accion->id }}"
+                                                   {{ (is_array(old('acciones_ids', $accionesAsignadasIds ?? [])) && in_array($accion->id, old('acciones_ids', $accionesAsignadasIds ?? []))) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="accion_edit_{{ $accion->id }}">
+                                                {{ $accion->nombre }}
+                                                {{-- <small class="text-muted">({{ $accion->ruta }})</small> --}} {{-- Ruta oculta --}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         @endforeach
                         @error('acciones_ids.*') <div class="error text-danger mt-2">{{ $message }}</div> @enderror
                     @else

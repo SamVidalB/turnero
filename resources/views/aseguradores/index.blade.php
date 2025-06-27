@@ -34,33 +34,33 @@
                 language: {
                     url: "https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json"
                 },
-                // dom: 'lBfrtip',  // Asegúrate de incluir esto para los botones
-                // buttons: [
-                //     {
-                //         extend: 'copy',
-                //         exportOptions: {
-                //             columns: ':not(:last-child)'  // Excluye la última columna
-                //         }
-                //     },
-                //     {
-                //         extend: 'excel',
-                //         exportOptions: {
-                //             columns: ':not(:last-child)'  // Excluye acciones
-                //         }
-                //     },
-                //     {
-                //         extend: 'pdf',
-                //         exportOptions: {
-                //             columns: ':not(:last-child)'  // Excluye la última columna
-                //         }
-                //     },
-                //     {
-                //         extend: 'print',
-                //         exportOptions: {
-                //             columns: ':not(:last-child)'  // Excluye la última columna
-                //         }
-                //     }
-                // ]
+                dom: 'lBfrtip',  // Asegúrate de incluir esto para los botones
+                buttons: [
+                    {
+                        extend: 'copy',
+                        exportOptions: {
+                            columns: ':not(:last-child)'  // Excluye la última columna
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: ':not(:last-child)'  // Excluye acciones
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: ':not(:last-child)'  // Excluye la última columna
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':not(:last-child)'  // Excluye la última columna
+                        }
+                    }
+                ]
             });
         });
     </script>

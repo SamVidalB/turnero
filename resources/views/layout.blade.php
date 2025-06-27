@@ -177,7 +177,11 @@
                     <div class="text-truncate" data-i18n="Usuarios">Usuarios</div>
                   </a>
                 </li>
-
+                <li class="menu-item {{ Request::is('permisos*') ? 'active' : '' }}">
+                  <a href="" class="menu-link"> {{-- Ajustar si la ruta de permisos es diferente --}}
+                    <div class="text-truncate" data-i18n="Permisos">Permisos</div>
+                  </a>
+                </li>
               </ul>
             </li>
 

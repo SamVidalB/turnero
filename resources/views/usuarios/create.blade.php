@@ -14,7 +14,7 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="nombre" class="form-label">Nombre Completo</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre" required value="{{ old('nombre') }}" autofocus>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required value="{{ old('nombre') }}">
                     @error('nombre') <div class="error text-danger">{{ $message }}</div> @enderror
                 </div>
 
@@ -28,27 +28,22 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="email" class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="email" name="email" required value="{{ old('email') }}" autocomplete="">
+                    <input type="email" class="form-control" id="email" name="email" required value="{{ old('email') }}">
                     @error('email') <div class="error text-danger">{{ $message }}</div> @enderror
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label for="rol" class="form-label">Rol</label>
-                    {{-- <input type="text" class="form-control" id="rol" name="rol" required value="{{ old('rol') }}"> --}}
-                    <select class="form-select" id="rol" name="rol" required>
-                        <option value="">Seleccione un rol</option>
-                        <option value="admin" {{ old('rol') == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="profesional" {{ old('rol') == 'profesional' ? 'selected' : '' }}>Profesional</option>
-                        <option value="auxiliar" {{ old('rol') == 'auxiliar' ? 'selected' : '' }}>Auxiliar</option>
-                    </select>
+                    <input type="text" class="form-control" id="rol" name="rol" required value="{{ old('rol') }}">
                     @error('rol') <div class="error text-danger">{{ $message }}</div> @enderror
+                    <!-- Podría ser un select si los roles son predefinidos -->
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="password" name="password" required autocomplete="new-password">
+                    <input type="password" class="form-control" id="password" name="password" required>
                     @error('password') <div class="error text-danger">{{ $message }}</div> @enderror
                 </div>
 
@@ -66,26 +61,24 @@
                 <div class="card-body">
                     @if(isset($accionesDisponibles) && $accionesDisponibles->count() > 0)
                         @php $currentModulo = ''; @endphp
-                        @foreach($accionesDisponibles as $accion)
-                            @if($accion->modulo !== $currentModulo)
-                                @if($currentModulo !== '')
-                                    </div> {{-- Cierra el div del grupo anterior de checkboxes --}}
-                                @endif
-                                <h6 class="mt-3">{{ $accion->modulo ?: 'General' }}</h6>
-                                <div class="list-group list-group-flush"> {{-- Abre un div para el nuevo grupo de checkboxes --}}
-                                @php $currentModulo = $accion->modulo; @endphp
-                            @endif
-                            <label class="list-group-item">
-                                <input class="form-check-input me-1" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_create_{{ $accion->id }}"
-                                       {{ (is_array(old('acciones_ids')) && in_array($accion->id, old('acciones_ids'))) ? 'checked' : '' }}>
-                                {{ $accion->nombre }}
-                                <small class="text-muted">({{ $accion->ruta }})</small>
-                            </label>
-                            @if($loop->last && $currentModulo !== '')
-                                </div> {{-- Cierra el último div del grupo de checkboxes --}}
-                            @endif
+                        @foreach($accionesDisponibles->groupBy('modulo') as $modulo => $accionesDelModulo)
+                            <h6 class="mt-3">{{ $modulo ?: 'General' }}</h6>
+                            <div class="row"> {{-- Contenedor de fila para las columnas de acciones --}}
+                                @foreach($accionesDelModulo as $accion)
+                                    <div class="col-md-4 mb-2"> {{-- 3 columnas en desktop, 1 en móvil --}}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_create_{{ $accion->id }}"
+                                                   {{ (is_array(old('acciones_ids')) && in_array($accion->id, old('acciones_ids'))) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="accion_create_{{ $accion->id }}">
+                                                {{ $accion->nombre }}
+                                                {{-- <small class="text-muted">({{ $accion->ruta }})</small> --}} {{-- Ruta oculta --}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         @endforeach
-                         @error('acciones_ids.*') <div class="error text-danger mt-2">{{ $message }}</div> @enderror
+                        @error('acciones_ids.*') <div class="error text-danger mt-2">{{ $message }}</div> @enderror
                     @else
                         <p>No hay acciones disponibles para asignar.</p>
                     @endif
@@ -112,8 +105,8 @@
                     documento: {
                         required: true,
                         minlength: 5,
-                        maxlength: 20,
-                        pattern: /^[0-9]+$/, // Ejemplo: solo números
+                        maxlength: 20
+                        // Considerar validación de solo números si aplica
                     },
                     email: {
                         required: true,
@@ -121,15 +114,17 @@
                         maxlength: 255
                     },
                     rol: {
-                        required: true
+                        required: true,
+                        minlength: 3,
+                        maxlength: 50
                     },
                     password: {
                         required: true,
-                        minlength: 6
+                        minlength: 8
                     },
                     password_confirmation: {
                         required: true,
-                        minlength: 6,
+                        minlength: 8,
                         equalTo: "#password"
                     }
                 },

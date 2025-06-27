@@ -52,7 +52,7 @@ class User extends Authenticatable
      */
     public function permiso()
     {
-        return $this->hasOne(Permiso::class, 'usuario_id');
+        return $this->hasOne(Permiso::class, 'user_id');
     }
 
     /**
