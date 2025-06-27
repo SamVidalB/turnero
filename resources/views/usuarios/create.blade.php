@@ -53,6 +53,40 @@
                 </div>
             </div>
 
+            <hr class="my-4">
+
+            {{-- Sección de Permisos --}}
+            <div class="card mt-4 mb-4">
+                <h5 class="card-header">Asignar Permisos</h5>
+                <div class="card-body">
+                    @if(isset($accionesDisponibles) && $accionesDisponibles->count() > 0)
+                        @php $currentModulo = ''; @endphp
+                        @foreach($accionesDisponibles as $accion)
+                            @if($accion->modulo !== $currentModulo)
+                                @if($currentModulo !== '')
+                                    </div> {{-- Cierra el div del grupo anterior de checkboxes --}}
+                                @endif
+                                <h6 class="mt-3">{{ $accion->modulo ?: 'General' }}</h6>
+                                <div class="list-group list-group-flush"> {{-- Abre un div para el nuevo grupo de checkboxes --}}
+                                @php $currentModulo = $accion->modulo; @endphp
+                            @endif
+                            <label class="list-group-item">
+                                <input class="form-check-input me-1" type="checkbox" name="acciones_ids[]" value="{{ $accion->id }}" id="accion_create_{{ $accion->id }}"
+                                       {{ (is_array(old('acciones_ids')) && in_array($accion->id, old('acciones_ids'))) ? 'checked' : '' }}>
+                                {{ $accion->nombre }}
+                                <small class="text-muted">({{ $accion->ruta }})</small>
+                            </label>
+                            @if($loop->last && $currentModulo !== '')
+                                </div> {{-- Cierra el último div del grupo de checkboxes --}}
+                            @endif
+                        @endforeach
+                         @error('acciones_ids.*') <div class="error text-danger mt-2">{{ $message }}</div> @enderror
+                    @else
+                        <p>No hay acciones disponibles para asignar.</p>
+                    @endif
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-primary">Crear Usuario</button>
         </form>
     </div>

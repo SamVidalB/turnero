@@ -31,7 +31,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('usuarios.create');
+        $accionesDisponibles = Accion::orderBy('modulo')->orderBy('nombre')->get();
+        return view('usuarios.create', compact('accionesDisponibles'));
     }
 
     /**
@@ -40,18 +41,20 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nombre'    => 'required|string|max:255',
-            'documento' => 'required|string|max:20|unique:usuarios,documento',
-            'email'     => 'required|string|email|max:255|unique:usuarios,email',
-            'password'  => 'required|string|min:8|confirmed',
-            'rol'       => 'required|string|max:50',
+            'nombre'         => 'required|string|max:255',
+            'documento'      => 'required|string|max:20|unique:usuarios,documento',
+            'email'          => 'required|string|email|max:255|unique:usuarios,email',
+            'password'       => 'required|string|min:8|confirmed',
+            'rol'            => 'required|string|max:50', // Considerar usar Rule::in(['admin', 'profesional', 'admision']) si los roles son fijos
+            'acciones_ids'   => 'nullable|array',
+            'acciones_ids.*' => ['integer', Rule::exists('acciones', 'id')],
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        User::create([
+        $usuario = User::create([
             'nombre'    => $request->nombre,
             'documento' => $request->documento,
             'email'     => $request->email,
@@ -60,7 +63,14 @@ class UserController extends Controller
             'estado'    => 1, // Por defecto activo
         ]);
 
-        return redirect('usuarios')->with('success', 'Usuario creado correctamente.');
+        $accionesSeleccionadas = $request->input('acciones_ids', []);
+        if (!empty($accionesSeleccionadas)) {
+            // Asegurarse de que los IDs sean enteros, ya que el JSON los puede tratar como string a veces.
+            $accionesSeleccionadas = array_map('intval', $accionesSeleccionadas);
+            $usuario->permiso()->create(['acciones' => $accionesSeleccionadas]);
+        }
+
+        return redirect('usuarios')->with('success', 'Usuario creado correctamente con sus permisos.');
     }
 
     /**
@@ -76,9 +86,10 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        $usuario = User::findOrFail($id); // Usar findOrFail para error 404 si no se encuentra
+        $usuario = User::findOrFail($id);
         $accionesDisponibles = Accion::orderBy('modulo')->orderBy('nombre')->get();
-        $accionesAsignadasIds = $usuario->acciones->pluck('id')->toArray();
+        // Usar el accesor y la relación correcta
+        $accionesAsignadasIds = $usuario->permiso ? $usuario->permiso->acciones : [];
 
         return view('usuarios.edit', compact('usuario', 'accionesDisponibles', 'accionesAsignadasIds'));
     }
@@ -86,39 +97,57 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user) // Inyección de modelo User para $user
     {
-        $usuario = User::find($id);
-        if (!$usuario) {
-            return redirect('usuarios')->with('error', 'Usuario no encontrado.');
-        }
+        // Ya no es necesario User::find($id) gracias a la inyección de modelos de ruta.
+        // $user ya está disponible.
 
         $validator = Validator::make($request->all(), [
-            'nombre'    => 'required|string|max:255',
-            'documento' => 'required|string|max:20|unique:usuarios,documento,' . $id,
-            'email'     => 'required|string|email|max:255|unique:usuarios,email,' . $id,
-            'password'  => 'nullable|string|min:8|confirmed', // Password es opcional en la actualización
-            'rol'       => 'required|string|max:50',
+            'nombre'         => 'required|string|max:255',
+            'documento'      => ['required', 'string', 'max:20', Rule::unique('usuarios', 'documento')->ignore($user->id)],
+            'email'          => ['required', 'string', 'email', 'max:255', Rule::unique('usuarios', 'email')->ignore($user->id)],
+            'password'       => 'nullable|string|min:8|confirmed',
+            'rol'            => 'required|string|max:50', // Considerar Rule::in([...])
+            'acciones_ids'   => 'nullable|array',
+            'acciones_ids.*' => ['integer', Rule::exists('acciones', 'id')],
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        $usuario->nombre = $request->nombre;
-        $usuario->documento = $request->documento;
-        $usuario->email = $request->email;
-        $usuario->rol = $request->rol;
+        $user->nombre = $request->nombre;
+        $user->documento = $request->documento;
+        $user->email = $request->email;
+        $user->rol = $request->rol;
 
         if ($request->filled('password')) {
-            $usuario->password = Hash::make($request->password);
+            $user->password = Hash::make($request->password);
         }
 
-        $usuario->save();
+        $user->save(); // Guardar los cambios del usuario
 
-        return redirect('usuarios')
-            ->with('message', 'Usuario actualizado correctamente.')
-            ->with('type', 'success');
+        // Lógica para actualizar permisos
+        $accionesSeleccionadas = $request->input('acciones_ids', []);
+        // Asegurarse de que los IDs sean enteros
+        $accionesSeleccionadas = array_map('intval', $accionesSeleccionadas);
+
+        if ($user->permiso) { // Si el usuario ya tiene un registro de permisos
+            if (!empty($accionesSeleccionadas)) {
+                $user->permiso->update(['acciones' => $accionesSeleccionadas]);
+            } else {
+                // Opción: Eliminar el registro de permiso si no se seleccionan acciones
+                $user->permiso->delete();
+                // Opción alternativa: Guardar un array vacío si se prefiere mantener el registro
+                // $user->permiso->update(['acciones' => []]);
+            }
+        } elseif (!empty($accionesSeleccionadas)) { // Si no tiene registro previo pero se seleccionaron acciones
+            $user->permiso()->create(['acciones' => $accionesSeleccionadas]);
+        }
+
+        return redirect()->route('usuarios.index') // Redirigir al index o a edit, según preferencia
+                         ->with('message', 'Usuario actualizado correctamente con sus permisos.')
+                         ->with('type', 'success');
     }
 
     /**
@@ -141,23 +170,9 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * Update the user's permissions.
-     */
-    public function updatePermissions(Request $request, User $user) // Inyección de modelo User
-    {
-        $request->validate([
-            'acciones_ids'   => 'nullable|array',
-            'acciones_ids.*' => [ // Validar cada elemento del array
-                'integer',
-                Rule::exists('acciones', 'id'), // Asegurar que cada ID exista en la tabla acciones
-            ],
-        ]);
-
-        $user->acciones()->sync($request->input('acciones_ids', []));
-
-        return redirect()->route('usuarios.edit', $user->id)
-                         ->with('message', 'Permisos actualizados correctamente.')
-                         ->with('type', 'success');
-    }
+    // El método updatePermissions ya no es necesario, su lógica se integró en update()
+    // public function updatePermissions(Request $request, User $user)
+    // {
+    //     // ...
+    // }
 }

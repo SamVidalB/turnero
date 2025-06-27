@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Usuarios (recordar que el controlador se llama UserController)
     Route::get('usuarios/trash', [UserController::class, 'trash'])->name('usuarios.trash');
-    Route::post('usuarios/{user}/permissions', [UserController::class, 'updatePermissions'])->name('usuarios.updatePermissions'); // Ruta para actualizar permisos
+    // La ruta Route::post('usuarios/{user}/permissions', ...) ya no es necesaria, se elimina.
     Route::resource('usuarios', UserController::class); // El recurso debe coincidir con el nombre base de las rutas
 
     // Pacientes
