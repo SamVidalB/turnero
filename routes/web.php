@@ -6,13 +6,16 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AseguradorController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SedeController;
-use App\Http\Controllers\UserController; // Corregido de UsuarioController a UserController
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\PermisoController;
+
+
 
 Route::get('/', function () {
-    // Si el usuario está autenticado, redirigir a una página de dashboard, sino al login
+
     if (auth()->check()) {
-        return redirect('/aseguradores'); // O cualquier otra ruta principal post-login
+        return redirect('/dashboard');
     }
     return view('login');
 });
@@ -55,10 +58,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('sedes/trash', [SedeController::class, 'trash'])->name('sedes.trash');
     Route::resource('sedes', SedeController::class);
 
-    // Usuarios (recordar que el controlador se llama UserController)
+    // Usuarios
     Route::get('usuarios/trash', [UserController::class, 'trash'])->name('usuarios.trash');
-    // La ruta Route::post('usuarios/{user}/permissions', ...) ya no es necesaria, se elimina.
-    Route::resource('usuarios', UserController::class); // El recurso debe coincidir con el nombre base de las rutas
+    Route::resource('usuarios', UserController::class); 
 
     // Pacientes
     Route::get('pacientes/trash', [PacienteController::class, 'trash'])->name('pacientes.trash');

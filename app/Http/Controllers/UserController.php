@@ -44,7 +44,7 @@ class UserController extends Controller
             'nombre'         => 'required|string|max:255',
             'documento'      => 'required|string|max:20|unique:usuarios,documento',
             'email'          => 'required|string|email|max:255|unique:usuarios,email',
-            'password'       => 'required|string|min:8|confirmed',
+            'password'       => 'required|string|min:6|confirmed',
             'rol'            => 'required|string|max:50', // Considerar usar Rule::in(['admin', 'profesional', 'admision']) si los roles son fijos
             'acciones_ids'   => 'nullable|array',
             'acciones_ids.*' => ['integer', Rule::exists('acciones', 'id')],
@@ -97,10 +97,9 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user) // Inyección de modelo User para $user
+    public function update(Request $request, string $id) // Inyección de modelo User para $user
     {
-        // Ya no es necesario User::find($id) gracias a la inyección de modelos de ruta.
-        // $user ya está disponible.
+        $user = User::find($id);
 
         $validator = Validator::make($request->all(), [
             'nombre'         => 'required|string|max:255',
