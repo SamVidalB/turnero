@@ -39,9 +39,10 @@ Route::get('/register', function () {
 
 Route::post('/register', [LoginController::class, 'register'])->name('register.store');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'permission'])->group(function () {
 
     // Ruta principal después del login (ejemplo)
+    // La ruta 'dashboard' está en la lista blanca del middleware CheckPermission, por lo que no se bloqueará aquí.
     Route::get('/dashboard', function () {
         return redirect('aseguradores'); // Redirige a aseguradores como página principal del dashboard
     })->name('dashboard');
@@ -66,6 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('pacientes/trash', [PacienteController::class, 'trash'])->name('pacientes.trash');
     Route::resource('pacientes', PacienteController::class);
 
+    // La ruta 'logout' está en la lista blanca del middleware CheckPermission.
     Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 });

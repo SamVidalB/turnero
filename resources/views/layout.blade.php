@@ -127,7 +127,7 @@
 
           <ul class="menu-inner py-1">
             
-            
+            {{-- El dashboard es accesible por defecto según el middleware, no necesita chequeo de permiso específico aquí si es una ruta general --}}
             <li class="menu-item {{ Request::is('dashboard') || Request::is('/') ? 'active' : '' }}">
               <a href="{{ route('dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home"></i>
@@ -135,51 +135,68 @@
               </a>
             </li>
 
-            <li class="menu-item {{ Request::is('turnos*') ? 'active' : '' }}">
-              <a href="{{ url('turnos') }}" class="menu-link"> {{-- Ajustar si la ruta de turnos es diferente --}}
-                <i class="menu-icon tf-icons bx bx-task"></i>
-                <div class="text-truncate" data-i18n="Turnos">Turnos</div>
-              </a>
-            </li>
+            {{-- Asumiendo que 'turnos.index' es la ruta principal para la sección de turnos --}}
+            {{-- Si no existe una ruta nombrada 'turnos.index', se debe ajustar o crear una o usar la URL directa si es necesario --}}
+            {{-- Por ahora, comentaré este bloque ya que 'turnos' no es una ruta nombrada y causaría error. --}}
+            {{-- @if(auth()->user()->hasAccionRuta('turnos.index')) --}}
+            {{-- <li class="menu-item {{ Request::is('turnos*') ? 'active' : '' }}"> --}}
+              {{-- <a href="{{ url('turnos') }}" class="menu-link"> --}}
+                {{-- <i class="menu-icon tf-icons bx bx-task"></i> --}}
+                {{-- <div class="text-truncate" data-i18n="Turnos">Turnos</div> --}}
+              {{-- </a> --}}
+            {{-- </li> --}}
+            {{-- @endif --}}
 
+            @if(auth()->user()->hasAccionRuta('pacientes.index'))
             <li class="menu-item {{ Request::is('pacientes*') ? 'active' : '' }}">
               <a href="{{ route('pacientes.index') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-user-plus"></i> {{-- Icono cambiado para pacientes --}}
+                <i class="menu-icon tf-icons bx bx-user-plus"></i>
                 <div class="text-truncate" data-i18n="Pacientes">Pacientes</div>
               </a>
             </li>
+            @endif
             
           
             <!-- Configuración -->
-            <li class="menu-item {{ Request::is('aseguradores*') || Request::is('categorias*') || Request::is('sedes*') || Request::is('usuarios*') || Request::is('permisos*') ? 'open active' : '' }}">
+            {{-- Para el menú de Configuración, solo se muestra si el usuario tiene permiso para AL MENOS UNA de las sub-secciones --}}
+            @if(auth()->user()->hasAccionRuta('aseguradores.index') || auth()->user()->hasAccionRuta('categorias.index') || auth()->user()->hasAccionRuta('sedes.index') || auth()->user()->hasAccionRuta('usuarios.index'))
+            <li class="menu-item {{ Request::is('aseguradores*') || Request::is('categorias*') || Request::is('sedes*') || Request::is('usuarios*') ? 'open active' : '' }}">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-cog"></i>
                 <div class="text-truncate" data-i18n="Configuración">Configuración</div>
               </a>
               <ul class="menu-sub">
+                @if(auth()->user()->hasAccionRuta('aseguradores.index'))
                 <li class="menu-item {{ Request::is('aseguradores*') ? 'active' : '' }}">
                   <a href="{{ route('aseguradores.index') }}" class="menu-link">
                     <div class="text-truncate" data-i18n="Aseguradores">Aseguradores</div>
                   </a>
                 </li>
+                @endif
+                @if(auth()->user()->hasAccionRuta('categorias.index'))
                 <li class="menu-item {{ Request::is('categorias*') ? 'active' : '' }}">
                   <a href="{{ route('categorias.index') }}" class="menu-link">
                     <div class="text-truncate" data-i18n="Categorías">Categorías</div>
                   </a>
                 </li>
+                @endif
+                @if(auth()->user()->hasAccionRuta('sedes.index'))
                 <li class="menu-item {{ Request::is('sedes*') ? 'active' : '' }}">
                   <a href="{{ route('sedes.index') }}" class="menu-link">
                     <div class="text-truncate" data-i18n="Sedes">Sedes</div>
                   </a>
                 </li>
+                @endif
+                @if(auth()->user()->hasAccionRuta('usuarios.index'))
                 <li class="menu-item {{ Request::is('usuarios*') ? 'active' : '' }}">
                   <a href="{{ route('usuarios.index') }}" class="menu-link">
                     <div class="text-truncate" data-i18n="Usuarios">Usuarios</div>
                   </a>
                 </li>
-
+                @endif
               </ul>
             </li>
+            @endif
 
           </ul>
         </aside>
