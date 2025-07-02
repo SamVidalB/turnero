@@ -45,7 +45,7 @@ class UserController extends Controller
             'documento'      => 'required|string|max:20|unique:usuarios,documento',
             'email'          => 'required|string|email|max:255|unique:usuarios,email',
             'password'       => 'required|string|min:6|confirmed',
-            'rol'            => 'required|string|max:50', // Considerar usar Rule::in(['admin', 'profesional', 'admision']) si los roles son fijos
+            'rol'            => ['required', Rule::in(['admin', 'profesional', 'admision']) ],
             'acciones_ids'   => 'nullable|array',
             'acciones_ids.*' => ['integer', Rule::exists('acciones', 'id')],
         ]);

@@ -29,14 +29,7 @@
             $('#tablaPacientes').DataTable({
                 language: {
                     url: "https://cdn.datatables.net/plug-ins/2.3.1/i18n/es-ES.json"
-                },
-                dom: 'lBfrtip',
-                buttons: [
-                    { extend: 'copy', exportOptions: { columns: ':not(:last-child)' } },
-                    { extend: 'excel', exportOptions: { columns: ':not(:last-child)' } },
-                    { extend: 'pdf', exportOptions: { columns: ':not(:last-child)' } },
-                    { extend: 'print', exportOptions: { columns: ':not(:last-child)' } }
-                ]
+                }
             });
         });
     </script>
