@@ -39,7 +39,6 @@ Route::get('/register', function () {
 
 Route::post('/register', [LoginController::class, 'register'])->name('register.store');
 
-
 Route::middleware(['auth', 'permission'])->group(function () {
 
     // Ruta principal después del login (ejemplo)

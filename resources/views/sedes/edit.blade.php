@@ -32,7 +32,39 @@
                 @error('direccion') <div class="error text-danger">{{ $message }}</div> @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary">Actualizar Sede</button>
+            <hr>
+            <h5>Puntos de Atención Actuales (Solo Informativo)</h5>
+            @if($sede->puntosAtencion && $sede->puntosAtencion->count() > 0)
+                <ul>
+                    @foreach($sede->puntosAtencion->groupBy(function($item) { return explode('-', $item->nombre)[0]; }) as $tipo => $puntos)
+                        <li><strong>{{ $tipo }}:</strong> {{ $puntos->count() }} punto(s) ({{ $puntos->pluck('nombre')->implode(', ') }})</li>
+                    @endforeach
+                </ul>
+            @else
+                <p>Esta sede no tiene puntos de atención asociados actualmente.</p>
+            @endif
+
+            <hr>
+            <h5>Configurar Nuevos Puntos de Atención (los existentes serán reemplazados)</h5>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="cantidad_admision" class="form-label">Cantidad Puntos de Admisión</label>
+                    <input type="number" class="form-control" id="cantidad_admision" name="cantidad_admision" value="{{ old('cantidad_admision', 0) }}" min="0">
+                    @error('cantidad_admision') <div class="error text-danger">{{ $message }}</div> @enderror
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="cantidad_consulta" class="form-label">Cantidad Puntos de Consulta</label>
+                    <input type="number" class="form-control" id="cantidad_consulta" name="cantidad_consulta" value="{{ old('cantidad_consulta', 0) }}" min="0">
+                    @error('cantidad_consulta') <div class="error text-danger">{{ $message }}</div> @enderror
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="cantidad_postconsulta" class="form-label">Cantidad Puntos de Postconsulta</label>
+                    <input type="number" class="form-control" id="cantidad_postconsulta" name="cantidad_postconsulta" value="{{ old('cantidad_postconsulta', 0) }}" min="0">
+                    @error('cantidad_postconsulta') <div class="error text-danger">{{ $message }}</div> @enderror
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Actualizar Sede y Puntos de Atención</button>
         </form>
     </div>
 @endsection
@@ -54,6 +86,18 @@
                     },
                     municipio: {
                         maxlength: 100
+                    },
+                    cantidad_admision: {
+                        digits: true,
+                        min: 0
+                    },
+                    cantidad_consulta: {
+                        digits: true,
+                        min: 0
+                    },
+                    cantidad_postconsulta: {
+                        digits: true,
+                        min: 0
                     }
                 },
                 messages: {

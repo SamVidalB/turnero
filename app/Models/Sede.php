@@ -20,5 +20,12 @@ class Sede extends Model
     {
         return $this->hasMany(Turno::class);
     }
-    
+
+    /**
+     * Obtener los puntos de atención asociados a esta sede.
+     */
+    public function puntosAtencion()
+    {
+        return $this->hasMany(PuntoAtencion::class);
+    }
 }

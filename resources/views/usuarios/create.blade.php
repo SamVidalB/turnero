@@ -39,7 +39,7 @@
                         <option value="">Seleccione un rol</option>
                         <option value="admin" {{ old('rol') == 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="profesional" {{ old('rol') == 'profesional' ? 'selected' : '' }}>Profesional</option>
-                        <option value="admision" {{ old('rol') == 'admision' ? 'selected' : '' }}>Admisión</option>
+                        <option value="auxiliar" {{ old('rol') == 'auxiliar' ? 'selected' : '' }}>Auxiliar</option>
                     </select>
                     @error('rol') <div class="error text-danger">{{ $message }}</div> @enderror
                 </div>
