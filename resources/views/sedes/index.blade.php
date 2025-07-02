@@ -38,6 +38,61 @@
                 //     { extend: 'print', exportOptions: { columns: ':not(:last-child)' } }
                 // ]
             });
+
+            // Lógica para la modal de detalles de sede
+            const sedeDetallesModal = document.getElementById('sedeDetallesModal');
+            const modalSedeNombre = document.getElementById('modalSedeNombre');
+            const modalSedeDireccion = document.getElementById('modalSedeDireccion');
+            const modalSedeMunicipio = document.getElementById('modalSedeMunicipio');
+            const modalSedePuntosAtencionLista = document.getElementById('modalSedePuntosAtencionLista');
+            const modalSedeError = document.getElementById('modalSedeError');
+
+            document.querySelectorAll('.btn-ver-detalles').forEach(button => {
+                button.addEventListener('click', function() {
+                    const sedeId = this.dataset.sedeId;
+
+                    // Limpiar contenido anterior y ocultar error
+                    modalSedeNombre.textContent = 'Cargando...';
+                    modalSedeDireccion.textContent = 'Cargando...';
+                    modalSedeMunicipio.textContent = 'Cargando...';
+                    modalSedePuntosAtencionLista.innerHTML = '<li>Cargando...</li>';
+                    modalSedeError.style.display = 'none';
+                    modalSedeError.textContent = '';
+
+                    fetch(`/sedes/${sedeId}/json`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Error HTTP: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            modalSedeNombre.textContent = data.nombre || 'N/A';
+                            modalSedeDireccion.textContent = data.direccion || 'N/A';
+                            modalSedeMunicipio.textContent = data.municipio || 'N/A';
+
+                            modalSedePuntosAtencionLista.innerHTML = ''; // Limpiar lista
+                            if (data.puntos_atencion && data.puntos_atencion.length > 0) {
+                                data.puntos_atencion.forEach(punto => {
+                                    const li = document.createElement('li');
+                                    li.textContent = punto.nombre;
+                                    modalSedePuntosAtencionLista.appendChild(li);
+                                });
+                            } else {
+                                modalSedePuntosAtencionLista.innerHTML = '<li>No hay puntos de atención asociados.</li>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error al cargar detalles de la sede:', error);
+                            modalSedeNombre.textContent = 'Error';
+                            modalSedeDireccion.textContent = 'Error';
+                            modalSedeMunicipio.textContent = 'Error';
+                            modalSedePuntosAtencionLista.innerHTML = '<li>Error al cargar puntos.</li>';
+                            modalSedeError.textContent = 'No se pudieron cargar los detalles de la sede. Por favor, inténtelo de nuevo más tarde.';
+                            modalSedeError.style.display = 'block';
+                        });
+                });
+            });
         });
     </script>
 @endsection
@@ -88,14 +143,43 @@
                             <form action="{{ url('sedes/' . $sede->id) }}" method="POST" style="display:inline;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-icon btn-outline-primary" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar esta sede?');">
+                                <button type="submit" class="btn btn-icon btn-outline-danger" title="Eliminar" onclick="return confirm('¿Está seguro de que desea eliminar esta sede?');">
                                     <span class="icon-base bx bx-trash icon-md"></span>
                                 </button>
                             </form>
+                            <button type="button" class="btn btn-icon btn-outline-info btn-ver-detalles" data-bs-toggle="modal" data-bs-target="#sedeDetallesModal" data-sede-id="{{ $sede->id }}" title="Ver Detalles">
+                                <span class="icon-base bx bx-show icon-md"></span>
+                            </button>
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+    </div>
+
+    <!-- Modal para Detalles de Sede -->
+    <div class="modal fade" id="sedeDetallesModal" tabindex="-1" aria-labelledby="sedeDetallesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sedeDetallesModalLabel">Detalles de la Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Nombre:</strong> <span id="modalSedeNombre"></span></p>
+                    <p><strong>Dirección:</strong> <span id="modalSedeDireccion"></span></p>
+                    <p><strong>Municipio:</strong> <span id="modalSedeMunicipio"></span></p>
+                    <hr>
+                    <h6>Puntos de Atención:</h6>
+                    <ul id="modalSedePuntosAtencionLista">
+                        <!-- Los puntos se cargarán aquí -->
+                    </ul>
+                    <div id="modalSedeError" class="alert alert-danger" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection

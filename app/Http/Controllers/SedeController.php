@@ -81,26 +81,17 @@ class SedeController extends Controller
             return $nuevaSede; // Devolver la sede creada para uso externo si fuera necesario
         });
 
-        // Lógica para crear Puntos de Atención
-        $tiposPuntos = [
-            'Admision' => 'Admisión',
-            'Consulta' => 'Consulta',
-            'Postconsulta' => 'Postconsulta'
-        ];
+        // La variable $sede aquí contendrá el resultado de la transacción (la nueva sede)
+        // o null si la transacción falló y no se lanzó una excepción explícita antes.
+        // En una transacción exitosa, $sede es la $nuevaSede.
 
-        foreach ($tiposPuntos as $keyRequest => $nombreBase) {
-            $cantidad = $request->input('cantidad_' . strtolower($keyRequest), 0);
-            if ($cantidad > 0) {
-                for ($i = 1; $i <= $cantidad; $i++) {
-                    PuntoAtencion::create([
-                        'sede_id' => $sede->id,
-                        'nombre' => $nombreBase . '-' . $i,
-                    ]);
-                }
-            }
+        if ($sede) {
+            return redirect('sedes')->with('success', 'Sede y puntos de atención creados correctamente.');
+        } else {
+            // Esto no debería ocurrir si la transacción se maneja correctamente
+            // y lanza excepciones en caso de error, o si create falla y devuelve null.
+            return redirect('sedes/create')->with('error', 'Hubo un problema al crear la sede.')->withInput();
         }
-
-        return redirect('sedes')->with('success', 'Sede y puntos de atención creados correctamente.');
     }
 
     /**
@@ -202,5 +193,19 @@ class SedeController extends Controller
         } else {
             return back()->with('message', 'Sede eliminada correctamente.')->with('type', 'danger');
         }
+    }
+
+    /**
+     * Display the specified resource in JSON format.
+     */
+    public function showJson(string $id)
+    {
+        $sede = Sede::with('puntosAtencion')->find($id);
+
+        if (!$sede) {
+            return response()->json(['message' => 'Sede no encontrada'], 404);
+        }
+
+        return response()->json($sede);
     }
 }

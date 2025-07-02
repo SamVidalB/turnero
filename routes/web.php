@@ -57,6 +57,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
     // Sedes
     Route::get('sedes/trash', [SedeController::class, 'trash'])->name('sedes.trash');
+    Route::get('sedes/{id}/json', [SedeController::class, 'showJson'])->name('sedes.showJson'); // Nueva ruta para JSON
     Route::resource('sedes', SedeController::class);
 
     // Usuarios
